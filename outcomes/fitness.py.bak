@@ -94,16 +94,16 @@ class FitnessTracker:
         from rich.console import Console
         from rich.table import Table
         console = Console()
-        table = Table(title="Fitness Dashboard")
-        table.add_column("Metric", style="cyan")
-        table.add_column("Value", style="magenta")
-        table.add_row("Projects", str(m.total_projects))
-        table.add_row("Successful Builds", str(m.successful_builds))
-        table.add_row("Successful Deploys", str(m.successful_deploys))
-        table.add_row("Revenue", f"${m.total_revenue:.2f}")
-        table.add_row("Compute Hours", f"{m.total_compute_hours:.3f}")
+        table = Table(title="SDAE Fitness Dashboard")
+        table.add_column("Metric")
+        table.add_column("Value")
+        table.add_row("Total Projects", str(m.total_projects))
+        table.add_row("Build Success Rate", f"{m.build_success_rate:.1%}")
+        table.add_row("Deploy Success Rate", f"{m.deploy_success_rate:.1%}")
+        table.add_row("Total Revenue", f"${m.total_revenue:.2f}")
+        table.add_row("Compute Hours", f"{m.total_compute_hours:.2f}h")
         table.add_row("Fitness Score", f"{m.fitness_score:.4f}")
-        table.add_row("Build Success Rate", f"{m.build_success_rate:.2%}")
-        table.add_row("Deploy Success Rate", f"{m.deploy_success_rate:.2%}")
         console.print(table)
-        logger.info(f"Dashboard summary: {m.summary()}")
+
+
+FITNESS = FitnessTracker()

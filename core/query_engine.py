@@ -2,10 +2,14 @@
 StreamingQueryEngine — the inner loop.
 Pattern extracted from Claude Code's QueryEngine.
 Runs tool-call cycles until the model stops calling tools or hits the limit.
-Max 3 tool calls per turn (Qwen2.5:9b constraint).
+Max 3 tool calls per turn (Qwen constraint).
+
+FIXED: strips <think>...</think> blocks from Qwen3 thinking model responses.
+FIXED: tool-call batch limit enforced correctly within a single round.
 """
 from __future__ import annotations
 import json
+import re
 from typing import Any, Callable
 from dataclasses import dataclass
 import ollama
@@ -14,6 +18,12 @@ from config import CFG
 from core.router import ROUTER
 from core.context_mgr import CTX_MGR
 from core.permission import PERMISSIONS
+
+_THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+
+
+def _strip_think(text: str) -> str:
+    return _THINK_RE.sub("", text).strip()
 
 
 @dataclass
@@ -74,7 +84,9 @@ class StreamingQueryEngine:
                 )
 
             msg = response["message"]
-            final_content = msg.get("content", "") or ""
+            raw_content = msg.get("content", "") or ""
+            # Strip <think> blocks from Qwen3 thinking model
+            final_content = _strip_think(raw_content)
 
             calls = msg.get("tool_calls") or []
             if not calls:
@@ -82,17 +94,17 @@ class StreamingQueryEngine:
 
             if tool_call_count >= CFG.max_tool_calls_per_turn:
                 forced = True
-                logger.debug(f"Tool call limit ({CFG.max_tool_calls_per_turn}) reached — forcing completion")
+                logger.debug(f"Tool call limit ({CFG.max_tool_calls_per_turn}) reached")
                 break
 
-            # Execute tool calls — enforce limit WITHIN the batch too
-            tool_messages = []
+            # Enforce batch limit
             remaining = CFG.max_tool_calls_per_turn - tool_call_count
-            calls_to_run = calls[:remaining]  # slice the batch to stay within budget
+            calls_to_run = calls[:remaining]
             if len(calls) > remaining:
                 forced = True
-                logger.debug(f"Batch of {len(calls)} trimmed to {remaining} (limit={CFG.max_tool_calls_per_turn})")
+                logger.debug(f"Batch trimmed {len(calls)} → {remaining}")
 
+            tool_messages = []
             for call in calls_to_run:
                 if tool_call_count >= CFG.max_tool_calls_per_turn:
                     break
@@ -130,11 +142,13 @@ class StreamingQueryEngine:
                     "content": result_str,
                     "name": fn_name,
                 })
-                logger.debug(f"Tool {fn_name} → {result_str[:120]}")
 
-            # Append assistant turn + tool results to history
-            # Use only the calls we actually ran (Ollama expects matching pairs)
-            full_messages.append({"role": "assistant", "content": final_content or "", "tool_calls": calls_to_run})
+            # Append assistant + tool results to history
+            full_messages.append({
+                "role": "assistant",
+                "content": final_content,
+                "tool_calls": calls_to_run,
+            })
             full_messages.extend(tool_messages)
 
         return TurnResult(
@@ -143,3 +157,7 @@ class StreamingQueryEngine:
             tool_calls_made=tool_call_count,
             forced_completion=forced,
         )
+
+
+def build_engine(tools, tool_handlers):
+    return StreamingQueryEngine(tools=tools, tool_handlers=tool_handlers)

@@ -1,3 +1,4 @@
 @echo off
+set PYTHONUNBUFFERED=1
 cd /d C:\Users\ll-33\Projects\sdae
-C:\Users\ll-33\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe main.py --daemon
+python main.py --daemon >> C:\Users\ll-33\.sdae\logs\daemon.log 2>&1

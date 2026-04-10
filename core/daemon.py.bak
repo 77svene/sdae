@@ -8,7 +8,6 @@ from __future__ import annotations
 import signal
 import time
 import json
-import sys
 from pathlib import Path
 from datetime import datetime
 from loguru import logger
@@ -22,17 +21,14 @@ class Daemon:
         self._state_file = CFG.data_dir / "daemon_state.json"
         self._cycle_count = 0
         self._agent_loop_fn = None  # injected from main.py
-        self._snapshot_interval = CFG.snapshot_interval_seconds
 
     def set_loop(self, fn):
         """Inject the main agent loop function."""
         self._agent_loop_fn = fn
 
     def start(self):
-        # Only register signal handlers on Unix-like systems
-        if sys.platform != "win32":
-            signal.signal(signal.SIGINT, self._handle_signal)
-            signal.signal(signal.SIGTERM, self._handle_signal)
+        signal.signal(signal.SIGINT, self._handle_signal)
+        signal.signal(signal.SIGTERM, self._handle_signal)
 
         self._running = True
         logger.info("SDAE Daemon started")
@@ -46,7 +42,7 @@ class Daemon:
         self._run_cycle()
 
         while self._running:
-            time.sleep(self._snapshot_interval)
+            time.sleep(60)
             self._snapshot_state()
 
         logger.info("Daemon stopped cleanly")
