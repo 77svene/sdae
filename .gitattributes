@@ -1,0 +1,16 @@
+# Normalize line endings to LF on commit, check out as-is
+* text=auto eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+*.bat text eol=crlf
+*.sh text eol=lf
+*.json text eol=lf
+
+# Binaries — no conversion
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.db binary

@@ -12,7 +12,7 @@ from pathlib import Path
 class Config:
     # LLM
     ollama_base_url: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    ollama_model: str = os.getenv("OLLAMA_MODEL", "qwen2.5:9b")
+    ollama_model: str = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
     ollama_ctx: int = int(os.getenv("OLLAMA_CTX", "8192"))
     temperature: float = float(os.getenv("TEMPERATURE", "0.1"))
 

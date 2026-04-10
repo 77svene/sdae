@@ -158,6 +158,10 @@ def build_engine() -> StreamingQueryEngine:
 
 def run_cycle(goal: str | None = None):
     """One full iteration of the outer loop."""
+    # Always ensure builder has an engine — safe to call multiple times
+    if BUILDER._qe is None:
+        BUILDER.set_engine(build_engine())
+
     start = time.time()
     project_id = uuid.uuid4().hex[:8]
 
@@ -265,11 +269,9 @@ def main(
         return
 
     if daemon:
-        BUILDER.set_engine(build_engine())
         DAEMON.set_loop(lambda: run_cycle(goal or None))
         DAEMON.start()
     else:
-        BUILDER.set_engine(build_engine())
         run_cycle(goal or None)
 
 

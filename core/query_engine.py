@@ -85,9 +85,15 @@ class StreamingQueryEngine:
                 logger.debug(f"Tool call limit ({CFG.max_tool_calls_per_turn}) reached — forcing completion")
                 break
 
-            # Execute tool calls
+            # Execute tool calls — enforce limit WITHIN the batch too
             tool_messages = []
-            for call in calls:
+            remaining = CFG.max_tool_calls_per_turn - tool_call_count
+            calls_to_run = calls[:remaining]  # slice the batch to stay within budget
+            if len(calls) > remaining:
+                forced = True
+                logger.debug(f"Batch of {len(calls)} trimmed to {remaining} (limit={CFG.max_tool_calls_per_turn})")
+
+            for call in calls_to_run:
                 if tool_call_count >= CFG.max_tool_calls_per_turn:
                     break
 
@@ -127,7 +133,8 @@ class StreamingQueryEngine:
                 logger.debug(f"Tool {fn_name} → {result_str[:120]}")
 
             # Append assistant turn + tool results to history
-            full_messages.append({"role": "assistant", "content": final_content, "tool_calls": calls})
+            # Use only the calls we actually ran (Ollama expects matching pairs)
+            full_messages.append({"role": "assistant", "content": final_content or "", "tool_calls": calls_to_run})
             full_messages.extend(tool_messages)
 
         return TurnResult(
