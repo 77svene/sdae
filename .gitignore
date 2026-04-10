@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# SDAE runtime data
+.sdae/
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets
+.env
+*.env
+secrets.json
+
+# Logs
+*.log
+logs/
+
+# Chroma
+chroma/
+chroma_db/
+
+# Project outputs (built by the agent at runtime)
+projects/
+worktrees/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
