@@ -1,0 +1,10 @@
+[32m2026-04-10 18:56:49.701[0m | [1mINFO    [0m | [36mmemory.warm[0m:[36m_init_chromadb[0m:[36m37[0m - [1mWarmMemory: ChromaDB at C:\Users\ll-33\.sdae\chroma (0 entries)[0m
+[32m2026-04-10 18:56:49.702[0m | [1mINFO    [0m | [36mmemory.cold[0m:[36m_init_db[0m:[36m59[0m - [1mColdMemory: C:\Users\ll-33\.sdae\cold.db[0m
+[32m18:56:49[0m | [1mINFO    [0m | SDAE Daemon started
+[32m18:56:49[0m | [1mINFO    [0m | Scheduled 'main_cycle' every 3600s
+[32m18:56:49[0m | [1mINFO    [0m | Scheduled 'weekly_report' daily at 08:00
+[32m18:56:49[0m | [1mINFO    [0m | Scheduler started
+[32m18:56:49[0m | [1mINFO    [0m | === CYCLE 1 START ===
+[32m18:56:53[0m | [1mINFO    [0m | Scanning market...
+[32m18:57:14[0m | [1mINFO    [0m | Scan complete: 49 unique opportunities
+[32m19:01:59[0m | [33m[1mWARNING [0m | No JSON in scorer response for: Show HN: Brutalist Concrete Laptop Stand

@@ -1,9 +1,11 @@
 """
 WorldModel — system state awareness. Disk, memory, CPU, network.
 The agent checks health before each cycle. If unhealthy, skips or throttles.
+FIXED: disk_usage uses Path.home().anchor for Windows compatibility.
 """
 from __future__ import annotations
 import shutil
+from pathlib import Path
 import psutil
 import requests
 from dataclasses import dataclass
@@ -42,8 +44,8 @@ class WorldModel:
         self._ollama_url = CFG.ollama_base_url
 
     def get_state(self) -> WorldState:
-        # Disk
-        disk = shutil.disk_usage("/")
+        # Disk — use home drive anchor for Windows/Linux compatibility
+        disk = shutil.disk_usage(Path.home().anchor)
         disk_free_gb = disk.free / (1024 ** 3)
 
         # RAM
